@@ -3,319 +3,93 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>To do List Board</title>
-    <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600;700&display=swap" rel="stylesheet">
+    <title>Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Gochi+Hand&display=swap" rel="stylesheet">
     <style>
         :root {
-            --board-bg: #0079bf;       /* Classic Trello Blue */
-            --list-bg: #ebecf0;        /* The gray column background */
+            --bg-color: #aed9f5;
             --card-bg: #ffffff;
-            --text-color: #172b4d;
+            --blue-btn: #82cff7;
+            --text-color: #333;
         }
-
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--board-bg);
+            font-family: 'Gochi Hand', cursive;
+            background-color: var(--bg-color);
             margin: 0;
-            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
             color: var(--text-color);
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            box-sizing: border-box;
         }
-
-        h1 {
-            color: white;
-            margin-top: 0;
-            font-size: 1.5rem;
-            margin-bottom: 20px;
-            padding-left: 10px;
-        }
-
-        /* The Board Layout */
-        .board {
-            display: flex;
-            align-items: flex-start; /* Align columns to top */
-            gap: 20px;
-            overflow-x: auto;
-            height: 100%;
-        }
-
-        /* The Columns (Lists) */
-        .column {
-            background-color: var(--list-bg);
-            width: 300px;
-            min-width: 300px;
-            border-radius: 3px;
-            padding: 10px;
-            display: flex;
-            flex-direction: column;
-            max-height: 100%;
-        }
-
-        .column-header {
-            font-weight: 600;
-            padding: 8px 0 12px 8px;
-            font-size: 0.95rem;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .task-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            overflow-y: auto; /* Scroll inside the column if many tasks */
-            flex-grow: 1;
-            min-height: 10px;
-        }
-
-        /* The Cards */
-        .task-card {
+        .login-container {
             background-color: var(--card-bg);
-            border-radius: 3px;
-            box-shadow: 0 1px 0 rgba(9,30,66,.25);
-            padding: 10px;
-            margin-bottom: 8px;
-            cursor: pointer;
-            position: relative;
-            transition: background 0.1s;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            group;
-        }
-
-        .task-card:hover {
-            background-color: #f4f5f7;
-        }
-
-        .task-title {
-            word-wrap: break-word;
-            width: 85%;
-            font-size: 0.9rem;
-            line-height: 1.4;
-        }
-
-        /* Done tasks styling */
-        .task-card.completed .task-title {
-            text-decoration: line-through;
-            color: #6b778c;
-        }
-
-        /* Action Buttons on Card (Hidden until hover) */
-        .card-actions {
-            opacity: 0;
-            transition: opacity 0.2s;
-            display: flex;
-            gap: 5px;
-        }
-
-        .task-card:hover .card-actions {
-            opacity: 1;
-        }
-
-        .icon-btn {
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 2px;
-            border-radius: 3px;
-            color: #6b778c;
-        }
-
-        .icon-btn:hover { background-color: #dfe1e6; color: #091e42; }
-
-        /* The "Add a card" Input Area */
-        .add-card-container {
-            margin-top: 8px;
-        }
-
-        .add-input {
+            padding: 40px;
+            border-radius: 30px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
             width: 100%;
-            padding: 8px;
-            border: none;
-            border-radius: 3px;
-            box-shadow: inset 0 0 0 2px #0079bf;
-            box-sizing: border-box;
-            display: none; /* Hidden by default */
-            margin-bottom: 8px;
+            max-width: 350px;
+            text-align: center;
         }
-
-        .add-btn-placeholder {
-            color: #5e6c84;
-            padding: 6px 8px;
-            border-radius: 3px;
-            cursor: pointer;
+        h1 {
+            font-size: 3rem;
+            margin: 0 0 30px 0;
+            font-weight: normal;
+        }
+        .input-group {
+            background-color: #f0f4f8;
+            border-radius: 50px;
+            padding: 10px 20px;
+            margin-bottom: 20px;
             display: flex;
             align-items: center;
         }
-
-        .add-btn-placeholder:hover {
-            background-color: rgba(9,30,66,.08);
-            color: #172b4d;
+        .input-field {
+            border: none;
+            background: none;
+            font-family: 'Gochi Hand', cursive;
+            font-size: 1.2rem;
+            flex-grow: 1;
+            outline: none;
+            color: #666;
         }
-
-        .add-controls {
-            display: none; /* Hidden by default */
-            align-items: center;
-            gap: 10px;
-        }
-
-        .save-btn {
-            background-color: #0079bf;
+        .input-field::placeholder { color: #999; }
+        .login-btn {
+            background-color: var(--blue-btn);
             color: white;
             border: none;
-            padding: 6px 12px;
-            border-radius: 3px;
-            cursor: pointer;
-            font-weight: 600;
-        }
-
-        .cancel-btn {
+            width: 100%;
+            padding: 12px;
+            border-radius: 50px;
             font-size: 1.5rem;
-            color: #6b778c;
             cursor: pointer;
-            line-height: 1;
+            font-family: 'Gochi Hand', cursive;
+            transition: transform 0.1s;
         }
-
-        /* Show input mode */
-        .adding .add-input, .adding .add-controls { display: flex; }
-        .adding .add-btn-placeholder { display: none; }
-
+        .login-btn:hover { transform: scale(1.05); background-color: #71c4ef; }
     </style>
 </head>
 <body>
-
-    <h1>📝 Team Board</h1>
-
-    <div class="board">
-        
-        <div class="column">
-            <div class="column-header">
-                <span>To Do</span>
-                <span>⋯</span>
+    <div class="login-container">
+        <h1>Let's Login!</h1>
+        <form id="loginForm">
+            <div class="input-group">
+                <span>👤 &nbsp;</span>
+                <input type="text" class="input-field" placeholder="Username" required>
             </div>
-            
-            <div id="todo-list" class="task-list">
-                </div>
-
-            <div class="add-card-container" id="add-container">
-                <div class="add-btn-placeholder" onclick="showInput()">
-                    <span>+ Add a card</span>
-                </div>
-                <textarea class="add-input" id="new-task-title" placeholder="Enter a title for this card..." rows="2"></textarea>
-                <div class="add-controls">
-                    <button class="save-btn" onclick="addTask()">Add Card</button>
-                    <span class="cancel-btn" onclick="hideInput()">×</span>
-                </div>
+            <div class="input-group">
+                <span>🔒 &nbsp;</span>
+                <input type="password" class="input-field" placeholder="Password" required>
             </div>
-        </div>
-
-        <div class="column">
-            <div class="column-header">
-                <span>Done</span>
-                <span>⋯</span>
-            </div>
-            <div id="done-list" class="task-list">
-                </div>
-        </div>
-
+            <button type="submit" class="login-btn">Login</button>
+        </form>
     </div>
-
     <script>
-        const API_URL = "http://127.0.0.1:8000/tasks";
-
-        // 1. Initial Load
-        window.onload = loadTasks;
-
-        async function loadTasks() {
-            try {
-                const response = await fetch(API_URL);
-                const tasks = await response.json();
-
-                const todoList = document.getElementById("todo-list");
-                const doneList = document.getElementById("done-list");
-
-                // Clear both lists
-                todoList.innerHTML = "";
-                doneList.innerHTML = "";
-
-                tasks.forEach(task => {
-                    const card = createCardElement(task);
-                    
-                    if (task.is_completed) {
-                        card.classList.add("completed");
-                        doneList.appendChild(card);
-                    } else {
-                        todoList.appendChild(card);
-                    }
-                });
-            } catch (err) {
-                console.error("Error loading tasks:", err);
-            }
-        }
-
-        function createCardElement(task) {
-            const div = document.createElement("div");
-            div.className = "task-card";
-            div.innerHTML = `
-                <span class="task-title">${task.title}</span>
-                <div class="card-actions">
-                    <button class="icon-btn" onclick="toggleTask(${task.id})" title="${task.is_completed ? 'Move to To Do' : 'Move to Done'}">
-                        ${task.is_completed ? '↩️' : '✅'}
-                    </button>
-                    <button class="icon-btn" onclick="deleteTask(${task.id})" title="Delete">
-                        🗑️
-                    </button>
-                </div>
-            `;
-            return div;
-        }
-
-        // 2. Add New Task
-        async function addTask() {
-            const input = document.getElementById("new-task-title");
-            const title = input.value.trim();
-            if (!title) return;
-
-            await fetch(API_URL, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ title: title })
-            });
-
-            input.value = "";
-            hideInput(); // Reset UI
-            loadTasks(); // Refresh board
-        }
-
-        // 3. Move Task (Toggle)
-        async function toggleTask(id) {
-            // This endpoint flips the boolean (False -> True, or True -> False)
-            await fetch(`${API_URL}/${id}`, { method: "PUT" });
-            loadTasks(); 
-        }
-
-        // 4. Delete Task
-        async function deleteTask(id) {
-            if(confirm("Delete this card?")) {
-                await fetch(`${API_URL}/${id}`, { method: "DELETE" });
-                loadTasks();
-            }
-        }
-
-        // UI Helpers for the "Add Card" animation
-        function showInput() {
-            document.getElementById("add-container").classList.add("adding");
-            document.getElementById("new-task-title").focus();
-        }
-
-        function hideInput() {
-            document.getElementById("add-container").classList.remove("adding");
-        }
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            // Redirects to your main app page
+            window.location.href = 'To_do.html';
+        });
     </script>
-
 </body>
 </html>

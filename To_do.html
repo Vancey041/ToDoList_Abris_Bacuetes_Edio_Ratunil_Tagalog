@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Todos</title>
+    <link href="https://fonts.googleapis.com/css2?family=Gochi+Hand&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #aed9f5;
+            --card-bg: #ffffff;
+            --blue-btn: #82cff7;
+            --pink-btn: #f5a9bc;
+            --text-color: #333;
+        }
+        body {
+            font-family: 'Gochi Hand', cursive;
+            background-color: var(--bg-color);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding-top: 50px;
+            color: var(--text-color);
+        }
+        .title-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        h1 {
+            font-size: 3.5rem;
+            margin: 0;
+            font-weight: normal;
+        }
+        .icon-star { font-size: 2rem; color: #fdd835; transform: rotate(-15deg); }
+        .icon-book { font-size: 2.5rem; color: #a855f7; }
+        .container {
+            width: 90%;
+            max-width: 500px;
+        }
+        .add-task-container {
+            background-color: var(--card-bg);
+            border-radius: 50px;
+            padding: 5px 5px 5px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+        }
+        .add-input {
+            border: none;
+            font-family: 'Gochi Hand', cursive;
+            font-size: 1.2rem;
+            flex-grow: 1;
+            outline: none;
+            color: #666;
+        }
+        .add-input::placeholder { color: #999; }
+        .add-btn {
+            background-color: var(--blue-btn);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.1s;
+        }
+        .add-btn:hover { transform: scale(1.1); }
+        .task-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .task-item {
+            background-color: var(--card-bg);
+            border-radius: 50px;
+            padding: 10px 10px 10px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+            font-size: 1.3rem;
+        }
+        .task-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-grow: 1;
+        }
+        .checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #ccc;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .checkbox.checked {
+            background-color: var(--blue-btn);
+            border-color: var(--blue-btn);
+        }
+        .checkbox.checked::after {
+            content: '✓';
+            color: white;
+            font-size: 1rem;
+        }
+        .task-text { flex-grow: 1; }
+        .task-item.completed .task-text {
+            text-decoration: line-through;
+            color: #999;
+        }
+        .delete-btn {
+            background-color: var(--pink-btn);
+            color: white;
+            border: none;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            transition: transform 0.1s;
+        }
+        .delete-btn:hover { transform: scale(1.1); }
+    </style>
+</head>
+<body>
+    <div class="title-container">
+        <span class="icon-star">✦</span>
+        <h1>My Todos</h1>
+        <span class="icon-book">📖</span>
+    </div>
+    <div class="container">
+        <div class="add-task-container">
+            <input type="text" class="add-input" id="taskInput" placeholder="Add a new task.....">
+            <button class="add-btn" onclick="addTask()">＋</button>
+        </div>
+        <ul class="task-list" id="taskList">
+            </ul>
+    </div>
+    <script>
+        const API_URL = "http://127.0.0.1:8000/tasks";
+        window.onload = loadTasks;
+
+        async function loadTasks() {
+            const response = await fetch(API_URL);
+            const tasks = await response.json();
+            const list = document.getElementById("taskList");
+            list.innerHTML = "";
+            tasks.forEach(task => {
+                const li = document.createElement("li");
+                li.className = `task-item ${task.is_completed ? "completed" : ""}`;
+                li.innerHTML = `
+                    <div class="task-left">
+                        <div class="checkbox ${task.is_completed ? "checked" : ""}" onclick="toggleTask(${task.id})"></div>
+                        <span class="task-text">${task.title}</span>
+                    </div>
+                    <button class="delete-btn" onclick="deleteTask(${task.id})">🗑</button>
+                `;
+                list.appendChild(li);
+            });
+        }
+
+        async function addTask() {
+            const input = document.getElementById("taskInput");
+            if (!input.value) return;
+            await fetch(API_URL, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ title: input.value })
+            });
+            input.value = "";
+            loadTasks();
+        }
+
+        async function toggleTask(id) {
+            await fetch(`${API_URL}/${id}`, { method: "PUT" });
+            loadTasks();
+        }
+
+        async function deleteTask(id) {
+            if(confirm("Delete this task?")) {
+                await fetch(`${API_URL}/${id}`, { method: "DELETE" });
+                loadTasks();
+            }
+        }
+    </script>
+</body>
+</html>
