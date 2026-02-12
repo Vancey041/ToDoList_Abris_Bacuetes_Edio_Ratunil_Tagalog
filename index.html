@@ -3,319 +3,245 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>To do List Board</title>
-    <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600;700&display=swap" rel="stylesheet">
+    <title>My Journal Todos</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap" rel="stylesheet">
+    
     <style>
         :root {
-            --board-bg: #0079bf;       /* Classic Trello Blue */
-            --list-bg: #ebecf0;        /* The gray column background */
-            --card-bg: #ffffff;
-            --text-color: #172b4d;
+            --bg-color: #BDE0FE;
+            --input-bg: #E8F1F5;
+            --accent-cyan: #8BE3F5;
+            --danger-red: #EFA6B6;
+            --text-dark: #2D3436;
         }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--board-bg);
-            margin: 0;
-            padding: 20px;
-            color: var(--text-color);
+            font-family: 'Patrick Hand', cursive;
+            background-color: #f0f4f8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .app-container {
+            background-color: var(--bg-color);
+            width: 375px;
+            height: 700px;
+            border-radius: 35px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            border: 8px solid white;
             display: flex;
             flex-direction: column;
-            height: 100vh;
-            box-sizing: border-box;
-        }
-
-        h1 {
-            color: white;
-            margin-top: 0;
-            font-size: 1.5rem;
-            margin-bottom: 20px;
-            padding-left: 10px;
-        }
-
-        /* The Board Layout */
-        .board {
-            display: flex;
-            align-items: flex-start; /* Align columns to top */
-            gap: 20px;
-            overflow-x: auto;
-            height: 100%;
-        }
-
-        /* The Columns (Lists) */
-        .column {
-            background-color: var(--list-bg);
-            width: 300px;
-            min-width: 300px;
-            border-radius: 3px;
-            padding: 10px;
-            display: flex;
-            flex-direction: column;
-            max-height: 100%;
-        }
-
-        .column-header {
-            font-weight: 600;
-            padding: 8px 0 12px 8px;
-            font-size: 0.95rem;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .task-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            overflow-y: auto; /* Scroll inside the column if many tasks */
-            flex-grow: 1;
-            min-height: 10px;
-        }
-
-        /* The Cards */
-        .task-card {
-            background-color: var(--card-bg);
-            border-radius: 3px;
-            box-shadow: 0 1px 0 rgba(9,30,66,.25);
-            padding: 10px;
-            margin-bottom: 8px;
-            cursor: pointer;
+            padding: 30px 20px;
             position: relative;
-            transition: background 0.1s;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            group;
         }
 
-        .task-card:hover {
-            background-color: #f4f5f7;
-        }
-
-        .task-title {
-            word-wrap: break-word;
-            width: 85%;
-            font-size: 0.9rem;
-            line-height: 1.4;
-        }
-
-        /* Done tasks styling */
-        .task-card.completed .task-title {
-            text-decoration: line-through;
-            color: #6b778c;
-        }
-
-        /* Action Buttons on Card (Hidden until hover) */
-        .card-actions {
-            opacity: 0;
-            transition: opacity 0.2s;
-            display: flex;
-            gap: 5px;
-        }
-
-        .task-card:hover .card-actions {
-            opacity: 1;
-        }
-
-        .icon-btn {
+        /* Logout Button (Top Right) */
+        .logout-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
             background: none;
             border: none;
+            color: #555;
+            font-size: 1.2rem;
             cursor: pointer;
-            padding: 2px;
-            border-radius: 3px;
-            color: #6b778c;
+            font-family: 'Patrick Hand', cursive;
         }
+        .logout-btn:hover { color: #d63031; }
 
-        .icon-btn:hover { background-color: #dfe1e6; color: #091e42; }
-
-        /* The "Add a card" Input Area */
-        .add-card-container {
-            margin-top: 8px;
-        }
-
-        .add-input {
-            width: 100%;
-            padding: 8px;
-            border: none;
-            border-radius: 3px;
-            box-shadow: inset 0 0 0 2px #0079bf;
-            box-sizing: border-box;
-            display: none; /* Hidden by default */
-            margin-bottom: 8px;
-        }
-
-        .add-btn-placeholder {
-            color: #5e6c84;
-            padding: 6px 8px;
-            border-radius: 3px;
-            cursor: pointer;
+        /* Header */
+        .header {
             display: flex;
             align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 30px;
+            margin-bottom: 25px;
         }
+        .header h1 { font-size: 2.2rem; font-weight: 400; color: var(--text-dark); }
+        .icon-star { color: #FFD93D; font-size: 1.5rem; transform: rotate(-15deg); margin-top: -20px; }
+        .icon-book { color: #C55FFC; font-size: 2rem; }
 
-        .add-btn-placeholder:hover {
-            background-color: rgba(9,30,66,.08);
-            color: #172b4d;
-        }
-
-        .add-controls {
-            display: none; /* Hidden by default */
+        /* Input */
+        .input-group {
+            background-color: var(--input-bg);
+            border-radius: 50px;
+            padding: 5px 5px 5px 20px;
+            display: flex;
             align-items: center;
-            gap: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .input-group input {
+            border: none; background: transparent;
+            font-family: 'Patrick Hand', cursive; font-size: 1.2rem;
+            width: 100%; outline: none; color: #555;
+        }
+        .add-btn {
+            background-color: var(--accent-cyan);
+            border: none; width: 45px; height: 45px;
+            border-radius: 50%; cursor: pointer;
+            color: #333; font-size: 1.2rem;
         }
 
-        .save-btn {
-            background-color: #0079bf;
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 3px;
-            cursor: pointer;
-            font-weight: 600;
+        /* List */
+        .todo-list-container {
+            flex-grow: 1; overflow-y: auto; padding-right: 5px;
         }
+        .todo-list-container::-webkit-scrollbar { width: 4px; }
+        .todo-list-container::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
 
-        .cancel-btn {
-            font-size: 1.5rem;
-            color: #6b778c;
-            cursor: pointer;
-            line-height: 1;
+        .todo-item {
+            background-color: var(--input-bg);
+            border-radius: 50px;
+            padding: 12px 12px 12px 20px;
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 15px; cursor: pointer; transition: transform 0.1s;
         }
+        .todo-item:hover { transform: scale(1.02); }
 
-        /* Show input mode */
-        .adding .add-input, .adding .add-controls { display: flex; }
-        .adding .add-btn-placeholder { display: none; }
+        .item-content { display: flex; align-items: center; gap: 15px; flex-grow: 1; }
+        .circle-check {
+            width: 20px; height: 20px; border: 2px solid #888; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; background: white;
+        }
+        .task-text { font-size: 1.1rem; color: #444; }
 
+        /* Completed */
+        .todo-item.completed { opacity: 0.7; background-color: #dbe4e9; }
+        .todo-item.completed .task-text { text-decoration: line-through; color: #888; }
+        .todo-item.completed .circle-check { background-color: #4CAF50; border-color: #4CAF50; }
+
+        .delete-btn {
+            background-color: var(--danger-red);
+            border: none; width: 35px; height: 35px; border-radius: 50%;
+            cursor: pointer; color: white;
+        }
     </style>
 </head>
 <body>
 
-    <h1>📝 Team Board</h1>
+    <div class="app-container">
+        <button class="logout-btn" onclick="logout()">
+            <i class="fa-solid fa-right-from-bracket"></i> Logout
+        </button>
 
-    <div class="board">
-        
-        <div class="column">
-            <div class="column-header">
-                <span>To Do</span>
-                <span>⋯</span>
-            </div>
-            
-            <div id="todo-list" class="task-list">
-                </div>
-
-            <div class="add-card-container" id="add-container">
-                <div class="add-btn-placeholder" onclick="showInput()">
-                    <span>+ Add a card</span>
-                </div>
-                <textarea class="add-input" id="new-task-title" placeholder="Enter a title for this card..." rows="2"></textarea>
-                <div class="add-controls">
-                    <button class="save-btn" onclick="addTask()">Add Card</button>
-                    <span class="cancel-btn" onclick="hideInput()">×</span>
-                </div>
-            </div>
+        <div class="header">
+            <i class="fa-solid fa-star icon-star"></i>
+            <h1 id="greeting">My Todos</h1>
+            <i class="fa-solid fa-book-open icon-book"></i>
         </div>
 
-        <div class="column">
-            <div class="column-header">
-                <span>Done</span>
-                <span>⋯</span>
-            </div>
-            <div id="done-list" class="task-list">
-                </div>
+        <div class="input-group">
+            <input type="text" id="new-task" placeholder="Add a new task....">
+            <button class="add-btn" onclick="addTask()">
+                <i class="fa-solid fa-plus"></i>
+            </button>
         </div>
 
+        <div class="todo-list-container" id="task-list">
+            </div>
     </div>
 
     <script>
         const API_URL = "http://127.0.0.1:8000/tasks";
+        
+        // 1. Check Auth on Load
+        const userId = localStorage.getItem("user_id");
+        const username = localStorage.getItem("username");
 
-        // 1. Initial Load
-        window.onload = loadTasks;
+        if (!userId) {
+            window.location.href = "login.html";
+        } else {
+            document.getElementById("greeting").innerText = `${username}'s Todos`;
+            loadTasks();
+        }
 
+        // 2. Logout
+        function logout() {
+            localStorage.clear();
+            window.location.href = "login.html";
+        }
+
+        // 3. API Functions
         async function loadTasks() {
             try {
-                const response = await fetch(API_URL);
-                const tasks = await response.json();
-
-                const todoList = document.getElementById("todo-list");
-                const doneList = document.getElementById("done-list");
-
-                // Clear both lists
-                todoList.innerHTML = "";
-                doneList.innerHTML = "";
-
-                tasks.forEach(task => {
-                    const card = createCardElement(task);
-                    
-                    if (task.is_completed) {
-                        card.classList.add("completed");
-                        doneList.appendChild(card);
-                    } else {
-                        todoList.appendChild(card);
-                    }
+                const res = await fetch(API_URL, {
+                    headers: { "user-id": userId }
                 });
-            } catch (err) {
-                console.error("Error loading tasks:", err);
-            }
+                if(res.status === 401) logout(); // Token invalid
+                const tasks = await res.json();
+                renderTasks(tasks);
+            } catch (err) { console.error(err); }
         }
 
-        function createCardElement(task) {
-            const div = document.createElement("div");
-            div.className = "task-card";
-            div.innerHTML = `
-                <span class="task-title">${task.title}</span>
-                <div class="card-actions">
-                    <button class="icon-btn" onclick="toggleTask(${task.id})" title="${task.is_completed ? 'Move to To Do' : 'Move to Done'}">
-                        ${task.is_completed ? '↩️' : '✅'}
-                    </button>
-                    <button class="icon-btn" onclick="deleteTask(${task.id})" title="Delete">
-                        🗑️
-                    </button>
-                </div>
-            `;
-            return div;
-        }
-
-        // 2. Add New Task
         async function addTask() {
-            const input = document.getElementById("new-task-title");
+            const input = document.getElementById('new-task');
             const title = input.value.trim();
-            if (!title) return;
+            if(!title) return;
 
             await fetch(API_URL, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ title: title })
+                headers: { 
+                    "Content-Type": "application/json",
+                    "user-id": userId 
+                },
+                body: JSON.stringify({ 
+                    title: title,
+                    owner_id: userId
+                })
             });
-
             input.value = "";
-            hideInput(); // Reset UI
-            loadTasks(); // Refresh board
+            loadTasks();
         }
 
-        // 3. Move Task (Toggle)
         async function toggleTask(id) {
-            // This endpoint flips the boolean (False -> True, or True -> False)
             await fetch(`${API_URL}/${id}`, { method: "PUT" });
-            loadTasks(); 
+            loadTasks();
         }
 
-        // 4. Delete Task
-        async function deleteTask(id) {
-            if(confirm("Delete this card?")) {
-                await fetch(`${API_URL}/${id}`, { method: "DELETE" });
-                loadTasks();
+        async function deleteTask(id, event) {
+            event.stopPropagation();
+            if(!confirm("Delete?")) return;
+            await fetch(`${API_URL}/${id}`, { method: "DELETE" });
+            loadTasks();
+        }
+
+        function renderTasks(tasks) {
+            const container = document.getElementById('task-list');
+            container.innerHTML = "";
+            
+            if (tasks.length === 0) {
+                container.innerHTML = `<p style="text-align:center; color:#777; margin-top:50px;">No tasks yet!</p>`;
+                return;
             }
-        }
 
-        // UI Helpers for the "Add Card" animation
-        function showInput() {
-            document.getElementById("add-container").classList.add("adding");
-            document.getElementById("new-task-title").focus();
+            tasks.forEach(task => {
+                const div = document.createElement('div');
+                div.className = `todo-item ${task.is_completed ? 'completed' : ''}`;
+                div.onclick = () => toggleTask(task.id);
+                div.innerHTML = `
+                    <div class="item-content">
+                        <div class="circle-check"></div>
+                        <span class="task-text">${task.title}</span>
+                    </div>
+                    <button class="delete-btn" onclick="deleteTask(${task.id}, event)">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                `;
+                container.appendChild(div);
+            });
         }
-
-        function hideInput() {
-            document.getElementById("add-container").classList.remove("adding");
-        }
+        
+        // Enter key support
+        document.getElementById('new-task').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') addTask();
+        });
     </script>
-
 </body>
 </html>

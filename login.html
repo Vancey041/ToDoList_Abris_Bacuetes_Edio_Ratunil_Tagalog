@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - My Journal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-color: #BDE0FE;
+            --input-bg: #ffffff;
+            --pink-btn: #F794C9;
+            --text-dark: #2D3436;
+        }
+
+        * {
+            box-sizing: border-box; /* Prevents padding from breaking layout */
+        }
+
+        body {
+            font-family: 'Patrick Hand', cursive;
+            background-color: #f0f4f8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .app-container {
+            background: linear-gradient(135deg, #BDE0FE 0%, #A2D2FF 100%);
+            width: 375px;
+            height: 700px; /* Fixed Phone Height */
+            border-radius: 35px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 30px;
+            border: 8px solid white;
+            position: relative;
+            
+            /* THIS FIXES THE SPACING: */
+            justify-content: center; 
+            gap: 20px; /* evenly spaces every element by 20px */
+        }
+
+        .icon-lock {
+            font-size: 3rem;
+            color: white;
+            background: rgba(255,255,255,0.25);
+            width: 90px;
+            height: 90px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            margin-bottom: 10px; /* Slight extra space below icon */
+        }
+
+        h1 {
+            color: white;
+            font-size: 3rem;
+            margin: 0; /* Removed fixed margin to let 'gap' handle it */
+            text-shadow: 2px 2px 0 rgba(0,0,0,0.1);
+            letter-spacing: 1px;
+        }
+
+        .input-group {
+            width: 100%;
+            margin: 0; /* Removed fixed margin */
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 15px 20px;
+            border-radius: 30px;
+            border: none;
+            background: var(--input-bg);
+            font-family: 'Patrick Hand', cursive;
+            font-size: 1.2rem;
+            text-align: center;
+            outline: none;
+            color: #555;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            transition: transform 0.2s;
+        }
+
+        .input-field:focus {
+            transform: scale(1.02);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+        }
+
+        .btn-login {
+            background-color: var(--pink-btn);
+            color: white;
+            border: none;
+            padding: 12px 0;
+            width: 100%;
+            border-radius: 30px;
+            font-family: 'Patrick Hand', cursive;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            margin-top: 10px; 
+            transition: transform 0.1s;
+        }
+
+        .btn-login:active { transform: scale(0.96); }
+
+        .toggle-text {
+            color: white;
+            font-size: 1.1rem;
+            cursor: pointer;
+            text-decoration: none;
+            opacity: 0.9;
+            margin-top: 10px;
+        }
+        
+        .toggle-text:hover {
+            opacity: 1;
+            text-decoration: underline;
+        }
+
+        /* Error Message Box */
+        #msg-box {
+            background: rgba(255, 255, 255, 0.95);
+            color: #d63031;
+            padding: 10px;
+            border-radius: 15px;
+            display: none;
+            width: 100%;
+            text-align: center;
+            font-size: 1rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <div class="icon-lock">
+            <i class="fa-solid fa-lock"></i>
+        </div>
+        
+        <h1 id="page-title">Login</h1>
+
+        <div id="msg-box"></div>
+
+        <div class="input-group">
+            <input type="text" id="username" class="input-field" placeholder="Username" autocomplete="off">
+        </div>
+        <div class="input-group">
+            <input type="password" id="password" class="input-field" placeholder="Password">
+        </div>
+
+        <button class="btn-login" onclick="handleAuth()" id="action-btn">Login</button>
+        
+        <div class="toggle-text" onclick="toggleMode()" id="toggle-link">
+            New here? Create an account
+        </div>
+    </div>
+
+    <script>
+        const API_URL = "http://127.0.0.1:8000";
+        let isRegistering = false;
+
+        function toggleMode() {
+            isRegistering = !isRegistering;
+            const title = document.getElementById('page-title');
+            const btn = document.getElementById('action-btn');
+            const link = document.getElementById('toggle-link');
+            const msg = document.getElementById('msg-box');
+
+            msg.style.display = 'none'; // Clear errors
+
+            if (isRegistering) {
+                title.innerText = "Register";
+                btn.innerText = "Sign Up";
+                link.innerText = "Already have an account? Login";
+            } else {
+                title.innerText = "Login";
+                btn.innerText = "Login";
+                link.innerText = "New here? Create an account";
+            }
+        }
+
+        async function handleAuth() {
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+            
+            if (!username || !password) {
+                showError("Please fill in all fields");
+                return;
+            }
+
+            const endpoint = isRegistering ? "/register" : "/login";
+            
+            try {
+                const response = await fetch(`${API_URL}${endpoint}`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    showError(data.detail || "An error occurred");
+                    return;
+                }
+
+                if (isRegistering) {
+                    alert("Account created! Please login.");
+                    toggleMode(); 
+                } else {
+                    localStorage.setItem("user_id", data.user_id);
+                    localStorage.setItem("username", data.username);
+                    window.location.href = "index.html";
+                }
+
+            } catch (err) {
+                showError("Cannot connect to server. Is main.py running?");
+            }
+        }
+
+        function showError(msg) {
+            const box = document.getElementById('msg-box');
+            box.innerText = msg;
+            box.style.display = 'block';
+        }
+    </script>
+</body>
+</html>
