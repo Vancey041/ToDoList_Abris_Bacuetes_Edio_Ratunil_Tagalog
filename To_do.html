@@ -13,6 +13,7 @@
             --pink-btn: #f5a9bc;
             --text-color: #333;
         }
+
         body {
             font-family: 'Gochi Hand', cursive;
             background-color: var(--bg-color);
@@ -23,24 +24,60 @@
             min-height: 100vh;
             padding-top: 50px;
             color: var(--text-color);
+            position: relative; /* Needed for absolute positioning of logout button */
         }
+
+        /* --- NEW: Logout Button Style --- */
+        .logout-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: var(--pink-btn);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-family: 'Gochi Hand', cursive;
+            font-size: 1.2rem;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.1s;
+            text-decoration: none; /* In case we use an anchor tag */
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .logout-btn:hover {
+            transform: scale(1.05);
+            background-color: #f094a8;
+        }
+
+        /* Title Section */
         .title-container {
             display: flex;
             align-items: center;
             gap: 15px;
             margin-bottom: 30px;
+            margin-top: 20px; /* Added slight margin so it doesn't hit logout button on mobile */
         }
+
         h1 {
             font-size: 3.5rem;
             margin: 0;
             font-weight: normal;
         }
+
         .icon-star { font-size: 2rem; color: #fdd835; transform: rotate(-15deg); }
         .icon-book { font-size: 2.5rem; color: #a855f7; }
+
+        /* Main Container */
         .container {
             width: 90%;
             max-width: 500px;
         }
+
+        /* Add Task Input */
         .add-task-container {
             background-color: var(--card-bg);
             border-radius: 50px;
@@ -51,6 +88,7 @@
             margin-bottom: 20px;
             box-shadow: 0 4px 8px rgba(0,0,0,0.05);
         }
+
         .add-input {
             border: none;
             font-family: 'Gochi Hand', cursive;
@@ -59,7 +97,9 @@
             outline: none;
             color: #666;
         }
+
         .add-input::placeholder { color: #999; }
+
         .add-btn {
             background-color: var(--blue-btn);
             color: white;
@@ -75,11 +115,14 @@
             transition: transform 0.1s;
         }
         .add-btn:hover { transform: scale(1.1); }
+
+        /* Task List */
         .task-list {
             list-style: none;
             padding: 0;
             margin: 0;
         }
+
         .task-item {
             background-color: var(--card-bg);
             border-radius: 50px;
@@ -91,12 +134,14 @@
             box-shadow: 0 4px 8px rgba(0,0,0,0.05);
             font-size: 1.3rem;
         }
+
         .task-left {
             display: flex;
             align-items: center;
             gap: 15px;
             flex-grow: 1;
         }
+
         .checkbox {
             width: 20px;
             height: 20px;
@@ -116,11 +161,13 @@
             color: white;
             font-size: 1rem;
         }
+
         .task-text { flex-grow: 1; }
         .task-item.completed .task-text {
             text-decoration: line-through;
             color: #999;
         }
+
         .delete-btn {
             background-color: var(--pink-btn);
             color: white;
@@ -139,21 +186,36 @@
     </style>
 </head>
 <body>
+
+    <button class="logout-btn" onclick="logout()">
+        Logout ➜
+    </button>
+
     <div class="title-container">
         <span class="icon-star">✦</span>
         <h1>My Todos</h1>
         <span class="icon-book">📖</span>
     </div>
+
     <div class="container">
         <div class="add-task-container">
             <input type="text" class="add-input" id="taskInput" placeholder="Add a new task.....">
             <button class="add-btn" onclick="addTask()">＋</button>
         </div>
+
         <ul class="task-list" id="taskList">
             </ul>
     </div>
+
     <script>
         const API_URL = "http://127.0.0.1:8000/tasks";
+
+        // --- NEW: Logout Function ---
+        function logout() {
+            // Simply redirect back to the login page (index.html)
+            window.location.href = 'index.html';
+        }
+
         window.onload = loadTasks;
 
         async function loadTasks() {
@@ -161,6 +223,7 @@
             const tasks = await response.json();
             const list = document.getElementById("taskList");
             list.innerHTML = "";
+
             tasks.forEach(task => {
                 const li = document.createElement("li");
                 li.className = `task-item ${task.is_completed ? "completed" : ""}`;
@@ -178,11 +241,13 @@
         async function addTask() {
             const input = document.getElementById("taskInput");
             if (!input.value) return;
+
             await fetch(API_URL, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ title: input.value })
             });
+
             input.value = "";
             loadTasks();
         }
@@ -199,5 +264,6 @@
             }
         }
     </script>
+
 </body>
 </html>
