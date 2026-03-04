@@ -4,6 +4,7 @@ from sqlmodel import Session, select, SQLModel, create_engine
 from fastapi.middleware.cors import CORSMiddleware
 from models import Task, User
 from pydantic import BaseModel
+from contextlib import asynccontextmanager
 import os
 
 # --- Database Setup ---
@@ -16,7 +17,17 @@ engine = create_engine(sqlite_url, connect_args={"check_same_thread": False})
 def create_db_and_tables():
     SQLModel.metadata.create_all(engine)
 
-app = FastAPI()
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # 1. This runs on startup
+    create_db_and_tables()
+    
+    yield # The app runs while paused here
+    
+    # 2. Anything placed here would run on shutdown
+    # (We don't have anything to clean up yet, so it just ends)
+
+app = FastAPI(lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
@@ -26,7 +37,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.on_event("startup")
 def on_startup():
     create_db_and_tables()
 
@@ -36,6 +46,10 @@ class UserAuth(BaseModel):
     password: str
 
 # --- API Endpoints ---
+
+@app.get("/")
+def read_root():
+    return {"message": "Welcome to the To-Do List API!"}
 
 # 1. REGISTER
 @app.post("/register")
