@@ -1,7 +1,6 @@
 typing
 fastapi 
 sqlmodel
-fastapi.middleware.cors
 models 
 pydantic
 contextlib 
