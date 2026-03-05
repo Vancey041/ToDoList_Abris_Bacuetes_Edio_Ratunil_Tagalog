@@ -1,7 +1,5 @@
 typing
 fastapi 
-sqlmodel
 pydantic
 contextlib 
-typing
 sqlmodel
