@@ -61,7 +61,7 @@ def register(user_data: UserAuth):
             raise HTTPException(status_code=400, detail="Username already taken")
         
         new_user = User(username=user_data.username, password=user_data.password)
-        session.add#(new_user)
+        session.add(new_user)
         session.commit()
         return {"message": "User created successfully"}
 
